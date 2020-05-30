@@ -1,0 +1,136 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="layout">
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-primary">
+                <div class="card-body clearfix">
+                    <div class="pull-right">
+                        <p class="h6 text-white m-t-0">今日活跃用户</p>
+                        <p class="h3 text-white m-b-0" th:text="${userToday}">102,125.00</p>
+                    </div>
+                    <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                            class="mdi mdi-account fa-1-5x"></i></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-danger">
+                <div class="card-body clearfix">
+                    <div class="pull-right">
+                        <p class="h6 text-white m-t-0">用户总数</p>
+                        <p class="h3 text-white m-b-0" th:text="${userCount}">920,000</p>
+                    </div>
+                    <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                            class="mdi mdi-account fa-1-5x"></i></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-success">
+                <div class="card-body clearfix">
+                    <div class="pull-right">
+                        <p class="h6 text-white m-t-0">今日新增订单</p>
+                        <p class="h3 text-white m-b-0" th:text="${orderCount}">244条</p>
+                    </div>
+                    <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                            class="mdi mdi-comment-outline fa-1-5x"></i></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-purple">
+                <div class="card-body clearfix">
+                    <div class="pull-right">
+                        <p class="h6 text-white m-t-0">今日新增帖子</p>
+                        <p class="h3 text-white m-b-0" th:text="${postCount}">34,005,000</p>
+                    </div>
+                    <div class="pull-left"><span class="img-avatar img-avatar-48 bg-translucent"><i
+                            class="mdi mdi-comment-outline fa-1-5x"></i></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>用户注册七日统计</h4>
+                </div>
+                <div class="card-body">
+                    <canvas class="count-user-daily"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>用户提问七日统计</h4>
+                </div>
+                <div class="card-body">
+                    <canvas class="count-question-daily"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript" layout:fragment="js">
+    $(function () {
+        let dayList = [[${dayList}]];
+        let countUserDaily = [[${countUserList}]];
+        let countQuestionDaily = [[${countOrderList}]];
+        dayList = dayList.toString().substr(1);
+        dayList = dayList.substr(0, dayList.length - 1);
+        countUserDaily = countUserDaily.toString().substr(1);
+        countUserDaily = countUserDaily.substr(0, countUserDaily.length - 1);
+        countQuestionDaily = countQuestionDaily.toString().substr(1);
+        countQuestionDaily = countQuestionDaily.substr(0, countQuestionDaily.length - 1);
+
+        var $countUserDailyChart = jQuery('.count-user-daily')[0].getContext('2d');
+        var $countUserDailyChartData = {
+            labels: dayList.split(","),
+            datasets: [
+                {
+                    label: '用户注册',
+                    borderWidth: 1,
+                    borderColor: 'rgba(0,0,0,0)',
+                    backgroundColor: 'rgba(51,202,185,0.5)',
+                    hoverBackgroundColor: "rgba(51,202,185,0.7)",
+                    hoverBorderColor: "rgba(0,0,0,0)",
+                    data: countUserDaily.split(",")
+                }
+            ]
+        };
+        var $countQuestionDailyChart = jQuery('.count-question-daily')[0].getContext('2d');
+        var $countQuestionDailyChartData = {
+            labels: dayList.split(","),
+            datasets: [
+                {
+                    label: '订单数量',
+                    borderWidth: 1,
+                    borderColor: '#358ed7',
+                    backgroundColor: 'rgba(53, 142, 215, 0.175)',
+                    data: countQuestionDaily.split(","),
+                    borderWidth: 1,
+                    fill: false,
+                    lineTension: 0.5
+                }
+            ]
+        };
+        new Chart($countUserDailyChart, {
+            type: 'bar',
+            data: $countUserDailyChartData
+        });
+
+        var myLineChart = new Chart($countQuestionDailyChart, {
+            type: 'line',
+            data: $countQuestionDailyChartData,
+        });
+    })
+</script>
+</html>

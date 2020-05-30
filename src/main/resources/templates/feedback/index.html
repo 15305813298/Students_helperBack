@@ -1,0 +1,126 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="layout">
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-toolbar clearfix">
+                    <form class="pull-right search-bar" method="get" action="#" role="form">
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <input type="hidden" name="search_field" id="search-field" value="title">
+                                <button class="btn btn-default dropdown-toggle" id="search-btn" data-toggle="dropdown"
+                                        type="button" aria-haspopup="true" aria-expanded="false">
+                                    内容 <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a tabindex="-1" href="javascript:void(0)" data-field="title">内容</a></li>
+                                </ul>
+                            </div>
+                            <input type="text" class="form-control" th:value="${keyword}" value="" name="keyword"
+                                   placeholder="请输入名称">
+                        </div>
+                    </form>
+                    <div class="toolbar-btn-action">
+                        <a class="btn btn-danger" onclick="deleteAll()" href="javascript:void(0)"><i
+                                class="mdi mdi-window-close"></i> 删除</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <label class="lyear-checkbox checkbox-primary">
+                                        <input type="checkbox" id="check-all"><span></span>
+                                    </label>
+                                </th>
+                                <th>编号</th>
+                                <th>内容</th>
+                                <th>用户</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${page}">
+                                <td>
+                                    <label class="lyear-checkbox checkbox-primary">
+                                        <input type="checkbox" id="checkbox" name="ids[]" th:value="${item.id}"
+                                               value="1"><span></span>
+                                    </label>
+                                </td>
+                                <td th:text="${item.id}">1</td>
+                                <td th:text="${item.content}"></td>
+                                <td th:text="${item.user.nickName ?: item.user.userName }"></td>
+                                <td th:text="${item.createdAt.toLocaleString()}">36</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a class="btn btn-xs btn-default" th:href="${'/feedback/delete/' + item.id}"
+                                           title="删除" data-toggle="tooltip"><i
+                                                class="mdi mdi-window-close"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <ul class="pagination">
+                        <li class="disabled" th:class="${page.number == 1 ? 'disabled' : ''}"><a
+                                th:href="${'/feedback?page=' + (page.pageable.pageNumber - 1)}">«</a>
+                        </li>
+                        <li th:class="${page.pageable.pageNumber == 0 ? 'active' : ''}"><a
+                                href="/feedback?page=0">1</a></li>
+                        <li th:if="${page.pageable.pageNumber - 3 > 1}" class="disabled">
+                            <span>...</span></li>
+                        <li th:each="pageNum : ${#numbers.sequence(page.pageable.pageNumber - 3, page.pageable.pageNumber + 4)}"
+                            th:class="${page.pageable.pageNumber == pageNum ? 'active' : ''}">
+                            <a th:href="${'/feedback?page=' + pageNum}" th:text="${pageNum + 1}"
+                               th:if="${pageNum < page.pageable.pageNumber && pageNum > 0 && pageNum < page.totalPages - 1}"></a>
+                            <a th:href="${'/feedback?page=' + pageNum}" th:text="${pageNum + 1}"
+                               th:if="${pageNum >= page.pageable.pageNumber && pageNum > 0 && pageNum < page.totalPages - 1}"></a>
+                        </li>
+                        <li th:if="${page.pageable.pageNumber + 4 < page.totalPages - 1 }" class="disabled">a
+                            <span>...</span></li>
+                        <li th:class="${page.pageable.pageNumber == page.totalPages - 1 ? 'active' : ''}"><a
+                                th:href="${'/feedback?page=' + (page.totalPages - 1)}"
+                                th:text="${page.totalPages}"
+                                th:if="${page.totalPages > 1}"></a></li>
+                        <li th:class="${page.pageable.pageNumber == page.totalPages ? 'disabled' : ''}"><a
+                                th:href="${'/feedback?page=' + page.pageable.pageNumber}">»</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script layout:fragment="js">
+    $(function () {
+        $('.search-bar .dropdown-menu a').click(function () {
+            var field = $(this).data('field') || '';
+            $('#search-field').val(field);
+            $('#search-btn').html($(this).text() + ' <span class="caret"></span>');
+        });
+    });
+
+    function deleteAll() {
+        let checkId = [];
+        $("#checkbox:checked").each(function (i) {
+            checkId[i] = +$(this).val()
+        });
+        if (checkId.length === 0) {
+            lightyear.notify("未选择任何列表项", "danger");
+            return
+        }
+        $.post("/feedback/deleteAll", {
+            checkId: JSON.stringify(checkId)
+        }, function (res) {
+            action(res.message, res.messageType, res.redirect)
+        });
+    }
+</script>
+</html>

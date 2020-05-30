@@ -1,0 +1,29 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="layout">
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <hr>
+                    <form method="post" action="/admin/update" class="site-form">
+                        <div class="form-group">
+                            <label for="username">用户名</label>
+                            <input type="text" class="form-control" name="username" id="username"
+                                   th:value="${admin.userName}"
+                                   disabled="disabled"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="nickname">昵称</label>
+                            <input type="text" class="form-control" name="nickname" id="nickname" placeholder="输入您的昵称"
+                                   th:value="${admin.nickName}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
